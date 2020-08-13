@@ -1,21 +1,20 @@
 <?php
+namespace Model;
 
-
-class BattleResult{
-
-
-private $usedJediPower;
-
-private $winingShip;
-
-private $losingShip;
-
-public function  __construct($usedJediPower, AbstractShip $winingShip = null, AbstractShip $losingShip= null)
+class BattleResult implements \ArrayAccess
 {
-    $this->usedJediPower = $usedJediPower;
-    $this->winingShip =  $winingShip;
-    $this->losingShip =  $losingShip;
-}
+    private $usedJediPower;
+
+    private $winingShip;
+
+    private $losingShip;
+
+    public function __construct($usedJediPower, AbstractShip $winingShip = null, AbstractShip $losingShip = null)
+    {
+        $this->usedJediPower = $usedJediPower;
+        $this->winingShip = $winingShip;
+        $this->losingShip = $losingShip;
+    }
 
     /**
      * @return boolean
@@ -41,12 +40,32 @@ public function  __construct($usedJediPower, AbstractShip $winingShip = null, Ab
     {
         return $this->losingShip;
     }
+
     public function isThereAWinner()
     {
         return $this->getWiningShip() !== null;
 
     }
 
+    public function offsetExists($offset)
+    {
+       return property_exists($this, $offset);
+    }
+
+    public function offsetGet($offset)
+    {
+      return $this->$offset;
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->$offset = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+      unset($this->$offset);
+    }
 
 
 }

@@ -1,22 +1,40 @@
 <?php
+namespace Service;
 
+use Model\BountyHuntership;
+use Model\RebelShip;
+use Model\Ship;
+use Model\AbstractShip;
+use Model\ShipCollection;
 class ShipLoader
+
+
 {
     private $shipStorage;
 
-    public function __construct(PdoShipStorage $shipStorage)
+    public function __construct(ShipStorageInterface $shipStorage)
     {
         $this->shipStorage = $shipStorage;
     }
 
-  public function getShips()
+    /**+
+     * @return ShipCollection
+     */
+    public function getShips()
     {
-        $shipsData = $this->queryForShips();
+        try {
+            $shipsData = $this->shipStorage->fetchAllShipsData();
+        }catch (\PDOException $e) {
+            trigger_error('DataBase Exception!'. $e->getMessage());
+            $shipData = [];
+        }
+
         $ships = array();
         foreach ($shipsData as $shipData) {
             $ships [] = $this->createShipFromData($shipData);
         }
-        return $ships;
+        $ships[] = new BountyHuntership('Slave I');
+        return new ShipCollection($ships);
     }
 
     /**
@@ -26,6 +44,7 @@ class ShipLoader
     public function findOneById($id)
     {
         $shipArray = $this->shipStorage->fetchSingleShipData($id);
+        return $this->createShipFromData($shipArray);
     }
 
     private function createShipFromData(array $shipData)

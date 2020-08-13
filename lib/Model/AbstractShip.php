@@ -1,5 +1,6 @@
 <?php
 
+namespace Model;
 abstract class AbstractShip
 {
     private $id;
@@ -9,7 +10,6 @@ abstract class AbstractShip
     private $weaponPower = 0;
 
     private $strength = 0;
-
 
 
     abstract public function getJediFactor();
@@ -36,7 +36,7 @@ abstract class AbstractShip
     public function setStrength($number)
     {
         if (!is_numeric($number)) {
-            throw new Exception('Invalid strength passed '.$number);
+            throw new \Exception('Invalid strength passed '.$number);
         }
 
         $this->strength = $number;
@@ -111,5 +111,12 @@ abstract class AbstractShip
     public function setId($id)
     {
         $this->id = $id;
+    }
+    public  function __toString()
+    {
+        return $this->getName();
+    }
+    public function  __get($propertyName){
+        return $this->$propertyName;
     }
 }

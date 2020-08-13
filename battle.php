@@ -1,13 +1,15 @@
 <?php
 require __DIR__.'/functions.php';
 require __DIR__.'/bootstrap.php';
+use Service\BattleManager;
+use Service\Container;
 
 $container  = new Container($config);
 $pdo = $container->getPDO();
 $shipLoader = $container->getShipLoader();
 $ships =  $shipLoader->getShips();
-
 $ship1Id = isset($_POST['ship1_id']) ? $_POST['ship1_id'] : null;
+
 $ship1Quantity = isset($_POST['ship1_quantity']) ? $_POST['ship1_quantity'] : 1;
 $ship2Id = isset($_POST['ship2_id']) ? $_POST['ship2_id'] : null;
 $ship2Quantity = isset($_POST['ship2_quantity']) ? $_POST['ship2_quantity'] : 1;
@@ -16,7 +18,8 @@ $ship1 = $shipLoader->findOneById($ship1Id);
 $ship2 = $shipLoader->findOneById($ship2Id);
 
 $battleManager = $container->getBattleManager();
-$battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Quantity);
+$battleType = $_POST['battle_type'];
+$battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Quantity,$battleType);
 ?>
 
 <html lang="en">
@@ -48,9 +51,9 @@ $battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Qua
                 <h2 class="text-center">The Matchup:</h2>
                 <p class="text-center">
                     <br>
-                    <?php echo $ship1Quantity; ?> <?php echo $ship1->getName() ?><?php echo $ship1Quantity > 1 ? 's': ''; ?>
+                    <?php echo $ship1Quantity; ?> <?php echo $ship1; ?><?php echo $ship1Quantity > 1 ? 's': ''; ?>
                     VS.
-                    <?php echo $ship2Quantity; ?> <?php echo $ship2->getName(); ?><?php echo $ship2Quantity > 1 ? 's': ''; ?>
+                    <?php echo $ship2Quantity; ?> <?php echo $ship2; ?><?php echo $ship2Quantity > 1 ? 's': ''; ?>
                 </p>
             </div>
             <div class="result-box center-block">
@@ -66,7 +69,7 @@ $battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Qua
                     <?php if ($battleResult->isThereAWinner()== null): ?>
                         Both ships destroyed each other in an epic battle to the end.
                     <?php else: ?>
-                        The <?php echo $battleResult->getWiningShip()->getName(); ?>
+                        The <?php echo $battleResult['winingShip']->getName(); ?>
                         <?php if ($battleResult->wereJediPowerUsed()): ?>
                             used its Jedi Powers for a stunning victory!
                         <?php else: ?>
@@ -77,11 +80,9 @@ $battleResult = $battleManager->battle($ship1, $ship1Quantity, $ship2, $ship2Qua
                 <h3>Ship Health</h3>
                 <dl class="dl-horizontal">
                     <dt><?php  echo $ship1->getName();?></dt>
-                    <dd><?php  echo $ship1->getStrength();?></dd>
-                    <dd><?php  echo $ship1->getName();?></dd>
+                    <dd><?php  echo $ship1->getStrength()?></dd>
                     <dt><?php  echo $ship2->getName();?></dt>
                     <dd><?php  echo $ship2->getStrength();?></dd>
-                    <dd><?php  echo $ship2->getName();?></dd>
                 </dl>
             </div>
             <a href="/index.php"><p class="text-center"><i class="fa fa-undo"></i> Battle again</p></a>
